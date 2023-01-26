@@ -1,5 +1,6 @@
+import { showPage } from "../../functions.js";
 import { TPixaBayHits } from "../../types.js";
-import { form, search_input, result_div } from "../../selectors.js";
+import { form, search_input, result_div, paginacion_div } from "../../selectors.js";
 export class UI {
 
     validateForm(): string {
@@ -11,8 +12,14 @@ export class UI {
         return term;
     }
 
-    showCards(pixaBayHits: TPixaBayHits[]) {
-        this.resetHtml();
+    showCards(pixaBayHits: TPixaBayHits[], pages: number) {
+        this.resetHtml(result_div);
+        this.resetHtml(paginacion_div);
+
+        if (!pixaBayHits.length) {
+            this.showAlert("No se encontraron imagenes, intente con otro término");
+            return;
+        }
         pixaBayHits.forEach(({ previewURL, largeImageURL, likes, views }) => {
             result_div.innerHTML += `
 
@@ -28,6 +35,22 @@ export class UI {
                 </div>
             `;
         });
+        this.showPagination(pages);
+    }
+
+    showPagination(pages: number) {
+
+        for (let i = 1; i <= pages; i++) {
+            const button = document.createElement("a");
+            button.href = "#";
+            button.dataset.pagina = i.toString();
+            button.textContent = i.toString();
+            button.classList.add("siguiente", "bg-yellow-400", "px-4", "py-1", "mr-2", "font-bold", "mb-10", "rounded", "justify-center");
+
+            button.onclick = () => showPage(i);
+
+            paginacion_div.append(button);
+        }
     }
 
     private showAlert(msg: string) {
@@ -49,9 +72,9 @@ export class UI {
         }, 3000);
     }
 
-    private resetHtml() {
-        while (result_div.firstChild) {
-            result_div.firstChild.remove();
+    private resetHtml(element: HTMLElement) {
+        while (element.firstChild) {
+            element.firstChild.remove();
         }
     }
 

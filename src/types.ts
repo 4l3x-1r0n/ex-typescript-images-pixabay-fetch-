@@ -3,6 +3,5 @@ export type TPixaBayHits = {
     largeImageURL: string;
     likes: number;
     views: number;
-
-
 }
+
